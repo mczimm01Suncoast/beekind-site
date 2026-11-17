@@ -201,6 +201,16 @@ button { font: inherit; color: inherit; }
   padding: 15px 24px 15px 20px; border-radius: 999px;
   box-shadow: 0 6px 0 rgba(21, 27, 84, .22), 0 16px 30px rgba(21, 27, 84, .18);
 }
+.store { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.store--center { align-items: center; }
+.store p { margin: 0; }
+.appname, .doc .appname {
+  display: inline-flex; align-items: center; gap: 12px; margin: 0; text-align: left;
+  font-family: var(--font-head); font-weight: 900; font-size: 1.25rem; line-height: 1.2; letter-spacing: -.01em;
+  font-synthesis-weight: none;
+}
+.appname img { width: 52px; height: 52px; flex: none; border-radius: 23%; box-shadow: 0 4px 12px rgba(21, 27, 84, .22); }
+.doc .appname { margin: 6px 0 20px; }
 .soon__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 0 rgba(255, 213, 61, .7); animation: dot 2.2s ease-out infinite; }
 @keyframes dot { to { box-shadow: 0 0 0 12px rgba(255, 213, 61, 0); } }
 
@@ -667,6 +677,7 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
   .top .round-btn { margin-left: auto; }
   .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-top: 96px; padding-bottom: 46px; text-align: center; }
   .hero__copy { display: flex; flex-direction: column; align-items: center; }
+  .store { align-items: center; }
   .lede { margin-inline: auto; }
   .jar-stage { width: clamp(240px, 62vw, 330px); }
   .steps { grid-template-columns: minmax(0, 1fr); max-width: 460px; margin-inline: auto; gap: 30px; }
@@ -694,6 +705,11 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 }
 
 /* ---------- Less motion ---------- */
+
+@media (max-width: 480px) {
+  .appname, .doc .appname { font-size: 1.08rem; gap: 10px; }
+  .appname img { width: 46px; height: 46px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
