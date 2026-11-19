@@ -59,6 +59,17 @@
 
   // ---------- The meadow ----------
 
+  // The look of the meadow: its season and its time of day (assets/js/look.js).
+  // With no look it is a summer day.
+  var LOOK = (window.BeeKindLook && window.BeeKindLook.colors) || {
+    season: 'summer', time: 'day', sky: ['#7ACBFA', '#B9E7FF'], sun: '#FFD83D', glow: '#FFF6B8', cloud: '#FFFFFF',
+    moon: false, stars: false, hills: ['#86D466', '#7ACB5C'],
+    crowns: [{ dark: '#29894F', base: '#33A45A', light: '#69BF6B' }, { dark: '#29894F', base: '#33A45A', light: '#69BF6B' }],
+    trunk: '#9A6A45', trunkDark: '#7A5033', crownLeaves: [], blossom: '#FFB3D4',
+    ground: ['#7DCC5B', '#74C653'], tuft: '#52B34D', shade: '#5CB24B', stem: '#4DAF4A', petal: '#FFFFFF',
+    flowers: true, blossoms: false, leaves: false, snow: false
+  };
+
   var sceneSeq = 0;
   var CLOUDS = [
     [0.20, 0.76, 1.00, 5.0], [0.78, 0.90, 0.92, 3.6], [0.55, 0.36, 0.62, 2.6],
@@ -73,16 +84,149 @@
     [0.185, 18, 1.0], [0.06, 105, 0.9], [0.31, 90, 0.9], [0.42, 170, 0.8], [0.5, 25, 0.8],
     [0.84, 27, 1.0], [0.66, 126, 0.8], [0.93, 136, 0.9], [0.24, 30, 0.7], [0.58, 12, 0.7]
   ];
+  // Places of the stars: across the page, and how far down the sky.
+  var STARS = [
+    [0.06, 0.30, 1.0], [0.14, 0.62, 0.7], [0.23, 0.16, 0.8], [0.31, 0.74, 1.0], [0.40, 0.42, 0.6],
+    [0.47, 0.86, 0.8], [0.55, 0.22, 0.7], [0.63, 0.66, 1.0], [0.71, 0.36, 0.6], [0.79, 0.80, 0.8],
+    [0.86, 0.50, 1.0], [0.94, 0.26, 0.7], [0.19, 0.90, 0.6], [0.68, 0.94, 0.7]
+  ];
+  // Places of the snow and of the leaves that fall: across the page, the start height, the size
+  // and the speed.
+  var FALLING = [
+    [0.04, 0.10, 1.0, 1.0], [0.11, 0.55, 0.7, 0.8], [0.17, 0.82, 0.9, 1.1], [0.24, 0.30, 0.6, 0.7],
+    [0.30, 0.68, 0.8, 0.9], [0.69, 0.20, 0.7, 0.8], [0.75, 0.74, 1.0, 1.0], [0.81, 0.44, 0.6, 0.7],
+    [0.87, 0.90, 0.9, 1.1], [0.93, 0.14, 0.8, 0.9], [0.98, 0.60, 0.7, 0.8], [0.08, 0.38, 0.6, 0.9],
+    [0.21, 0.02, 0.8, 1.0], [0.78, 0.04, 0.9, 0.9], [0.90, 0.34, 0.7, 1.0], [0.14, 0.96, 0.7, 0.8],
+    [0.42, 0.48, 0.8, 0.9], [0.52, 0.08, 0.7, 1.0], [0.60, 0.88, 0.9, 0.8], [0.36, 0.26, 0.6, 1.0]
+  ];
+  var LEAF_COLORS = ['#E8792B', '#D9A02B', '#D9542B'];
 
-  function flowerSvg(w, h) {
+  // The plants at the two sides, as in the app (MeadowView.swift): three at the left side, then
+  // three at the right side. The first one of a side is a tree at the edge. The next two are bushes.
+  // Each one: the place across a normal phone as a part of its width, the height above the grass
+  // edge, and the size.
+  var PLANTS = [[0.05, -43, 34], [0.13, -26, 28], [0.215, -8, 20], [0.96, -39, 36], [0.885, -22, 26], [0.8, -8, 18]];
+  // The width of a normal phone. The places of the plants were made for it.
+  var PLANT_WIDTH = 402;
+  // How far the crown of a tree is above its place, as a part of its size. Its trunk shows below.
+  var TREE_LIFT = 0.42;
+
+  // A number from 0 to 1. The same `seed` and `step` give the same number each time.
+  function chance(seed, step) {
+    var v = Math.sin(seed * 12.9898 + step * 78.233) * 43758.5453;
+    return v - Math.floor(v);
+  }
+
+  // The round parts of the crown of one plant: the middle and the size of each, as parts of the
+  // size of the plant. The first one is the core. The others stand around it, each with its own
+  // size, and make the leafy edge. So a crown is one shape with bumps, not a ball.
+  function crownParts(seed, tree) {
+    var wide = tree ? 1 : 1.14, tall = tree ? 1 : 0.86;
+    var parts = [[0, 0, 0.72]];
+    for (var k = 0; k < 7; k++) {
+      var angle = (k + chance(seed, k) * 0.45) / 7 * 2 * Math.PI;
+      var distance = 0.58 + chance(seed, k + 20) * 0.10;
+      var size = 0.30 + chance(seed, k + 40) * 0.10;
+      parts.push([Math.cos(angle) * distance * wide, Math.sin(angle) * distance * tall, size]);
+    }
+    return parts;
+  }
+
+  // The middle of one plant across the page. The size of a plant follows `unit`, not the width.
+  // So on a wide screen the plants of a side keep the distance that they have on a phone, from
+  // the near edge. Then they stay one group, and they do not come apart.
+  function plantX(x, width, unit) {
+    var left = x < 0.5;
+    var part = left ? x : 1 - x;
+    var fromEdge = Math.min(part * width, part * PLANT_WIDTH * unit);
+    return left ? fromEdge : width - fromEdge;
+  }
+
+  function crownSvg(parts, mx, my, r, fill) {
+    var out = '<g fill="' + fill + '">';
+    for (var i = 0; i < parts.length; i++) {
+      out += '<circle cx="' + r1(mx + parts[i][0] * r) + '" cy="' + r1(my + parts[i][1] * r) + '" r="' + r1(parts[i][2] * r) + '"/>';
+    }
+    return out + '</g>';
+  }
+
+  /**
+   * One tree or one bush: a leafy crown with a dark side, a light side and, in autumn, single
+   * leaves in other colors. A tree has a trunk. `size` is the size of the small parts, `sunX` is
+   * the place of the sun across the page: the light comes from its side. `inset` moves the plant
+   * away from its edge of the page.
+   */
+  function plantSvg(index, w, H, u, hill, size, sunX, inset) {
+    var p = PLANTS[index];
+    var tree = index % 3 === 0;
+    var r = p[2] * size;
+    var mx = plantX(p[0], w, size) + (p[0] < 0.5 ? inset : -inset);
+    var my = H + (p[1] - (tree ? TREE_LIFT * p[2] : 0)) * u * hill;
+    var tones = LOOK.crowns[index % 3 === 1 ? 1 : 0];
+    var parts = crownParts(index, tree);
+    var side = sunX >= mx ? 1 : -1;
+    var out = '', k;
+
+    if (tree) {
+      // The trunk goes from the crown down into the grass. The grass hides its foot.
+      var footY = H + 14 * u, topY = my + r * 0.25, midY = (footY + topY) / 2;
+      out += '<path fill="' + LOOK.trunk + '" d="M' + r1(mx - r * 0.21) + ' ' + r1(footY) +
+        'Q' + r1(mx - r * 0.12) + ' ' + r1(midY) + ' ' + r1(mx - r * 0.12) + ' ' + r1(topY) +
+        'L' + r1(mx + r * 0.12) + ' ' + r1(topY) +
+        'Q' + r1(mx + r * 0.12) + ' ' + r1(midY) + ' ' + r1(mx + r * 0.21) + ' ' + r1(footY) + 'Z"/>';
+      // The side of the trunk away from the sun is darker.
+      out += '<path fill="' + LOOK.trunkDark + '" d="M' + r1(mx - side * r * 0.21) + ' ' + r1(footY) +
+        'Q' + r1(mx - side * r * 0.12) + ' ' + r1(midY) + ' ' + r1(mx - side * r * 0.12) + ' ' + r1(topY) +
+        'L' + r1(mx - side * r * 0.02) + ' ' + r1(topY) +
+        'Q' + r1(mx - side * r * 0.02) + ' ' + r1(midY) + ' ' + r1(mx - side * r * 0.06) + ' ' + r1(footY) + 'Z"/>';
+    }
+
+    out += crownSvg(parts, mx, my, r, tones.dark);
+    // The main color lies a little to the side of the sun. The dark tone stays as an edge at the
+    // other side: this makes the crown look round and full.
+    out += crownSvg(parts, mx + side * r * 0.05, my - r * 0.07, r * 0.92, tones.base);
+    if (LOOK.snow) {
+      // Snow lies on the top of each crown. A green edge stays around it.
+      out += crownSvg(parts, mx + side * r * 0.05, my - r * 0.24, r * 0.68, LOOK.hills[0]);
+    } else {
+      // The leaves in the sun: the same leafy shape, smaller, at the side of the sun.
+      out += crownSvg(parts, mx + side * r * 0.17, my - r * 0.22, r * 0.58, tones.light);
+    }
+    // Single leaves in other colors, in autumn.
+    for (k = 0; k < 7 && LOOK.crownLeaves.length; k++) {
+      var angle = chance(index, k + 60) * 2 * Math.PI;
+      var distance = 0.18 + chance(index, k + 80) * 0.52;
+      var lx = r1(mx + Math.cos(angle) * distance * r), ly = r1(my + Math.sin(angle) * distance * r * 0.9);
+      out += '<ellipse cx="' + lx + '" cy="' + ly + '" rx="' + r1(0.13 * r) + '" ry="' + r1(0.07 * r) +
+        '" transform="rotate(' + r1(chance(index, k + 100) * 180) + ' ' + lx + ' ' + ly + ')" fill="' +
+        LOOK.crownLeaves[(index + k) % LOOK.crownLeaves.length] + '"/>';
+    }
+    // Pink blossoms on the trees and the bushes in spring.
+    for (k = 0; k < 5 && LOOK.blossoms; k++) {
+      var a = k * 1.3 + index;
+      out += '<circle cx="' + r1(mx + Math.cos(a) * r * 0.55) + '" cy="' + r1(my + Math.sin(a) * r * 0.5 - r * 0.1) +
+        '" r="' + r1(4.2 * size) + '" fill="' + LOOK.blossom + '"/>';
+    }
+    return out;
+  }
+
+  // In spring some flowers are pink and some are white.
+  function flowerSvg(w, h, n) {
+    var color = LOOK.season === 'spring' && n % 2 === 1 ? '#FFFFFF' : LOOK.petal;
     var petals = '';
     for (var i = 0; i < 5; i++) {
       var a = i / 5 * 2 * Math.PI - Math.PI / 2;
-      petals += '<circle cx="' + r1(Math.cos(a) * 6.2) + '" cy="' + r1(-19 + Math.sin(a) * 6.2) + '" r="5.4" fill="#fff"/>';
+      petals += '<circle cx="' + r1(Math.cos(a) * 6.2) + '" cy="' + r1(-19 + Math.sin(a) * 6.2) + '" r="5.4" fill="' + color + '"/>';
     }
     return '<svg viewBox="-13 -32 26 33" width="' + r1(w) + '" height="' + r1(h) + '">' +
-      '<path d="M0 0Q3 -8 0 -15" fill="none" stroke="#4DAF4A" stroke-width="2.6" stroke-linecap="round"/>' +
+      '<path d="M0 0Q3 -8 0 -15" fill="none" stroke="' + LOOK.stem + '" stroke-width="2.6" stroke-linecap="round"/>' +
       petals + '<circle cx="0" cy="-19" r="4.4" fill="#FFD23F"/></svg>';
+  }
+
+  // A leaf that lies on the grass in autumn, where a flower is in summer.
+  function leafSvg(w, h, n) {
+    return '<svg viewBox="-9 -9 18 10" width="' + r1(w) + '" height="' + r1(h) + '">' +
+      '<ellipse cx="0" cy="-4" rx="7.5" ry="4" transform="rotate(' + (n * 47 % 180) + ' 0 -4)" fill="' + LEAF_COLORS[n % 3] + '"/></svg>';
   }
 
   function tuftSvg(w, h) {
@@ -93,7 +237,7 @@
       d += '<path d="M' + b[0] + ' 0Q' + b[0] + ' ' + r1(-b[2] * 0.6) + ' ' + b[1] + ' ' + (-b[2]) + '"/>';
     }
     return '<svg viewBox="-12 -17 24 18" width="' + r1(w) + '" height="' + r1(h) + '">' +
-      '<g fill="none" stroke="#52B34D" stroke-width="4" stroke-linecap="round">' + d + '</g></svg>';
+      '<g fill="none" stroke="' + LOOK.tuft + '" stroke-width="4" stroke-linecap="round">' + d + '</g></svg>';
   }
 
   function buildScene(host) {
@@ -101,26 +245,43 @@
     var sky = div('scene__sky');
     host.appendChild(sky);
 
-    var sun = div('sun');
-    var rays = '';
-    for (var i = 0; i < 8; i++) {
-      var a = i / 8 * 2 * Math.PI;
-      rays += '<line x1="' + r1(Math.cos(a) * 39.8) + '" y1="' + r1(Math.sin(a) * 39.8) +
-        '" x2="' + r1(Math.cos(a) * 52) + '" y2="' + r1(Math.sin(a) * 52) + '"/>';
+    // Stars at night, behind the moon and the clouds.
+    var stars = null;
+    if (LOOK.stars) {
+      stars = div('scene__stars');
+      sky.appendChild(stars);
     }
-    sun.innerHTML = '<svg viewBox="-100 -100 200 200"><defs>' +
-      '<radialGradient id="' + id + 'glow" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="87">' +
-      '<stop offset=".19" stop-color="#FFF6B8" stop-opacity=".8"/><stop offset=".6" stop-color="#FFF6B8" stop-opacity=".25"/>' +
-      '<stop offset="1" stop-color="#FFF6B8" stop-opacity="0"/></radialGradient></defs>' +
-      '<circle class="sun__glow" r="87" fill="url(#' + id + 'glow)"/>' +
-      '<g class="sun__rays" stroke="#FFD83D" stroke-width="7.3" stroke-linecap="round">' + rays + '</g>' +
-      '<circle r="28" fill="#FFD83D"/></svg>';
+
+    var sun = div('sun');
+    var glowDefs = '<defs><radialGradient id="' + id + 'glow" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="87">' +
+      '<stop offset=".19" stop-color="' + LOOK.glow + '" stop-opacity="' + (LOOK.moon ? '.48' : '.8') + '"/>' +
+      '<stop offset=".6" stop-color="' + LOOK.glow + '" stop-opacity="' + (LOOK.moon ? '.15' : '.25') + '"/>' +
+      '<stop offset="1" stop-color="' + LOOK.glow + '" stop-opacity="0"/></radialGradient>';
+    if (LOOK.moon) {
+      // At night the moon is in the place of the sun: a thin moon, with no rays.
+      sun.innerHTML = '<svg viewBox="-100 -100 200 200">' + glowDefs +
+        '<mask id="' + id + 'moon"><rect x="-100" y="-100" width="200" height="200" fill="#fff"/>' +
+        '<circle cx="12.9" cy="-6.2" r="24.6" fill="#000"/></mask></defs>' +
+        '<circle class="sun__glow" r="87" fill="url(#' + id + 'glow)"/>' +
+        '<circle r="29.4" fill="' + LOOK.sun + '" mask="url(#' + id + 'moon)"/></svg>';
+    } else {
+      var rays = '';
+      for (var i = 0; i < 8; i++) {
+        var a = i / 8 * 2 * Math.PI;
+        rays += '<line x1="' + r1(Math.cos(a) * 39.8) + '" y1="' + r1(Math.sin(a) * 39.8) +
+          '" x2="' + r1(Math.cos(a) * 52) + '" y2="' + r1(Math.sin(a) * 52) + '"/>';
+      }
+      sun.innerHTML = '<svg viewBox="-100 -100 200 200">' + glowDefs + '</defs>' +
+        '<circle class="sun__glow" r="87" fill="url(#' + id + 'glow)"/>' +
+        '<g class="sun__rays" stroke="' + LOOK.sun + '" stroke-width="7.3" stroke-linecap="round">' + rays + '</g>' +
+        '<circle r="28" fill="' + LOOK.sun + '"/></svg>';
+    }
     sky.appendChild(sun);
 
     var clouds = [];
     for (var c = 0; c < CLOUDS.length; c++) {
       var cloud = div('cloud');
-      cloud.innerHTML = '<div class="cloud__bob"><svg viewBox="-1 -0.56 2 1.07"><g fill="#fff">' +
+      cloud.innerHTML = '<div class="cloud__bob"><svg viewBox="-1 -0.56 2 1.07"><g fill="' + LOOK.cloud + '">' +
         '<rect x="-1" y="-.12" width="2" height=".62" rx=".31"/><circle cx="-.17" cy="-.1" r=".45"/>' +
         '<circle cx=".34" cy="-.03" r=".39"/></g></svg></div>';
       sky.appendChild(cloud);
@@ -133,10 +294,18 @@
     var plants = div('scene__plants');
     host.appendChild(plants);
 
+    // Snow in winter and a few leaves in autumn fall slowly.
+    var fall = null;
+    if (LOOK.snow || LOOK.leaves) {
+      fall = div('scene__fall');
+      host.appendChild(fall);
+    }
+
     /**
      * Puts the parts in their places.
      * `horizon` is the height of the grass edge in pixels. `opts.avoid` is a list of boxes
-     * with no flowers. `opts.sunX` is the place of the sun, from 0 to 1.
+     * with no flowers. `opts.sunX` is the place of the sun, from 0 to 1. `opts.clear` is a list
+     * of boxes with text or glass: snow and leaves do not fall across them.
      */
     function layout(horizon, opts) {
       opts = opts || {};
@@ -149,9 +318,10 @@
       var k;
 
       // Sun
+      var sunX = (opts.sunX == null ? (wide ? 0.9 : 0.84) : opts.sunX) * w;
       var sunSize = 200 * u * (wide ? 0.82 : 0.9);
       sun.style.setProperty('--sun', r1(sunSize) + 'px');
-      sun.style.setProperty('--sx', r1((opts.sunX == null ? (wide ? 0.9 : 0.84) : opts.sunX) * w) + 'px');
+      sun.style.setProperty('--sx', r1(sunX) + 'px');
       sun.style.setProperty('--sy', r1(Math.max(opts.sunTop || 110, horizon - (wide ? 150 : 165) * u)) + 'px');
 
       // Clouds drift across the sky. They stay above the hills.
@@ -173,15 +343,31 @@
         clouds[k].style.setProperty('--rest', r1(spec[0] * w) + 'px');
       }
 
-      // Hills, bushes and the near ground
+      // Stars: in the sky above the hills.
+      var html = '';
+      if (stars) {
+        var starBottom = Math.max(skyTop + 1, horizon - 120 * u * hill);
+        for (k = 0; k < STARS.length; k++) {
+          var sd = r1(3.8 * u * STARS[k][2]);
+          html += '<i class="star' + (reduce ? ' star--still' : '') + '" style="left:' + r1(STARS[k][0] * w) + 'px;top:' +
+            r1(skyTop + STARS[k][1] * (starBottom - skyTop)) + 'px;width:' + sd + 'px;height:' + sd + 'px;--tw:' +
+            r1(3.5 + (k % 4) * 1.1) + 's;--delay:' + r1(-k * 0.7) + 's"></i>';
+        }
+        stars.innerHTML = html;
+      }
+
+      // Hills, trees and bushes, and the near ground
       var H = horizon;
-      var bushes = [[0.02, -43, 34], [0.13, -26, 28], [0.215, -8, 20], [0.99, -39, 36], [0.885, -22, 26], [0.8, -8, 18]];
+      var size = u * (wide ? 0.9 : 1);
+      // On a wide screen each group stands a little away from the edge: the whole tree shows.
+      var inset = wide ? 20 * size : 0;
       var s = '<defs><linearGradient id="' + id + 'ground" gradientUnits="userSpaceOnUse" x1="0" y1="' + r1(H - 40 * u) +
-        '" x2="0" y2="' + h + '"><stop offset="0" stop-color="#7DCC5B"/><stop offset="1" stop-color="#74C653"/></linearGradient></defs>';
-      s += '<ellipse cx="' + r1(w * 0.16) + '" cy="' + r1(H + 101 * u * hill) + '" rx="' + r1(w * 0.72) + '" ry="' + r1(214 * u * hill) + '" fill="#86D466"/>';
-      s += '<ellipse cx="' + r1(w * 0.9) + '" cy="' + r1(H + 118 * u * hill) + '" rx="' + r1(w * 0.66) + '" ry="' + r1(218 * u * hill) + '" fill="#7ACB5C"/>';
-      for (k = 0; k < bushes.length; k++) {
-        s += '<circle cx="' + r1(bushes[k][0] * w) + '" cy="' + r1(H + bushes[k][1] * u * hill) + '" r="' + r1(bushes[k][2] * u * (wide ? 0.8 : 1)) + '" fill="#33A45A"/>';
+        '" x2="0" y2="' + h + '"><stop offset="0" stop-color="' + LOOK.ground[0] + '"/><stop offset="1" stop-color="' + LOOK.ground[1] + '"/></linearGradient></defs>';
+      s += '<ellipse cx="' + r1(w * 0.16) + '" cy="' + r1(H + 101 * u * hill) + '" rx="' + r1(w * 0.72) + '" ry="' + r1(214 * u * hill) + '" fill="' + LOOK.hills[0] + '"/>';
+      s += '<ellipse cx="' + r1(w * 0.9) + '" cy="' + r1(H + 118 * u * hill) + '" rx="' + r1(w * 0.66) + '" ry="' + r1(218 * u * hill) + '" fill="' + LOOK.hills[1] + '"/>';
+      // A tree and two bushes at each side, from the back to the front.
+      for (k = 0; k < PLANTS.length; k++) {
+        s += plantSvg(k, w, H, u, hill, size, sunX, inset);
       }
       s += '<path d="M0 ' + r1(H) + 'C' + r1(w * 0.3) + ' ' + r1(H - 39 * u) + ' ' + r1(w * 0.7) + ' ' + r1(H + 35 * u) + ' ' + w + ' ' + r1(H + 4 * u) +
         'L' + w + ' ' + (h + 600) + 'L0 ' + (h + 600) + 'Z" fill="url(#' + id + 'ground)"/>';
@@ -189,7 +375,8 @@
       hills.setAttribute('preserveAspectRatio', 'xMidYMin slice');
       hills.innerHTML = s;
 
-      // Flowers and grass move in the breeze.
+      // Flowers and grass move in the breeze. In autumn leaves lie on the grass in place of the
+      // flowers. In winter there are no flowers.
       var avoid = opts.avoid || [];
       function free(x, y) {
         for (var a = 0; a < avoid.length; a++) {
@@ -198,20 +385,56 @@
         }
         return y < h - 14 && y > H + 8;
       }
-      var html = '';
-      function plant(list, make, bw, bh, every) {
+      html = '';
+      function plant(list, make, bw, bh, every, still) {
         for (var n = 0; n < list.length; n++) {
           if (!wide && n % every !== 0) continue;
           var x = list[n][0] * w, y = H + list[n][1] * u;
           var sz = list[n][2] * u * (wide ? 0.82 : 1);
           if (!free(x, y)) continue;
-          html += '<div class="plant" style="left:' + r1(x) + 'px;top:' + r1(y) + 'px;--sd:' + r1(2.8 + (n % 4) * 0.5) +
-            's;--delay:' + r1(-list[n][0] * 7) + 's">' + make(bw * sz, bh * sz) + '</div>';
+          html += '<div class="plant' + (still ? ' plant--still' : '') + '" style="left:' + r1(x) + 'px;top:' + r1(y) + 'px;--sd:' + r1(2.8 + (n % 4) * 0.5) +
+            's;--delay:' + r1(-list[n][0] * 7) + 's">' + make(bw * sz, bh * sz, n) + '</div>';
         }
       }
-      plant(TUFTS, tuftSvg, 24, 18, 2);
-      plant(FLOWERS, flowerSvg, 26, 33, 2);
+      plant(TUFTS, tuftSvg, 24, 18, 2, false);
+      if (LOOK.flowers) plant(FLOWERS, flowerSvg, 26, 33, 2, false);
+      else if (LOOK.leaves) plant(FLOWERS, leafSvg, 18, 10, 2, true);
       plants.innerHTML = html;
+
+      // Snow and leaves that fall. They stay below the top bar, and they do not fall across a
+      // box with text or across the glass of the jar.
+      if (fall) {
+        var clear = opts.clear || [];
+        var fallTop = skyTop - 20, fallSpan = Math.max(1, h - fallTop);
+        html = '';
+        for (k = 0; k < FALLING.length; k++) {
+          var f = FALLING[k];
+          // Leaves are fewer than snowflakes.
+          if (LOOK.leaves && k % 3 !== 0) continue;
+          if (!wide && k >= 16) continue;
+          var fx = f[0] * w, blocked = false;
+          for (var cb = 0; cb < clear.length; cb++) {
+            if (fx > clear[cb].left && fx < clear[cb].right) blocked = true;
+          }
+          if (blocked) continue;
+          var dur = fallSpan / (9 * u * f[3] * (LOOK.leaves ? 1.2 : 1));
+          var bit;
+          if (LOOK.snow) {
+            var d = r1((1.6 + 1.5 * f[2]) * u * 2);
+            bit = '<i class="fall__bit" style="width:' + d + 'px;height:' + d + 'px;background:#fff"></i>';
+          } else {
+            bit = '<i class="fall__bit fall__bit--leaf" style="width:' + r1(12 * u * f[2]) + 'px;height:' + r1(6.4 * u * f[2]) +
+              'px;background:' + LEAF_COLORS[k % 3] + ';--turn:' + (k * 41 % 360) + 'deg"></i>';
+          }
+          if (reduce) {
+            html += '<div class="fall fall--still" style="left:' + r1(fx) + 'px;top:' + r1(fallTop + f[1] * fallSpan) + 'px">' + bit + '</div>';
+          } else {
+            html += '<div class="fall" style="left:' + r1(fx) + 'px;--y0:' + r1(fallTop) + 'px;--y1:' + r1(h) + 'px;--dur:' + r1(dur) +
+              's;--delay:' + r1(-f[1] * dur) + 's"><div class="fall__sway" style="--sway:' + r1(7 * u) + 'px;--delay:' + r1(-k * 2.1) + 's">' + bit + '</div></div>';
+          }
+        }
+        fall.innerHTML = html;
+      }
     }
 
     return { host: host, sky: sky, layout: layout };
@@ -222,7 +445,7 @@
   var hero = $('.hero');
   var stage = $('#jarStage');
   var jarBee = BK.createBee({ mode: 'ring' });
-  var jar = BK.createJar({ goal: 5, bee: jarBee, level: 0.4 });
+  var jar = BK.createJar({ goal: 5, bee: jarBee, level: 0.4, shade: LOOK.shade });
   stage.appendChild(jar.el);
   jarBee.setFlap(reduce ? 'off' : 'slow');
 
@@ -243,14 +466,18 @@
     var horizon = (jr.top - hr.top) + 0.58 * jarW;
     heroScene.layout(horizon, {
       skyBottom: (jr.top - hr.top) + 0.1 * jarW,
-      avoid: [boxIn(jar.el, hr, 4), boxIn($('.hero__copy'), hr, 14), boxIn($('.demo__actions'), hr, 16)]
+      avoid: [boxIn(jar.el, hr, 4), boxIn($('.hero__copy'), hr, 14), boxIn($('.demo__actions'), hr, 16)],
+      // Snow and leaves do not fall behind the glass of the jar. On a wide screen they also stay
+      // out of the column with the text.
+      clear: hr.width > 760 ? [boxIn(jar.el, hr, 8), boxIn($('.hero__copy'), hr, 10)] : [boxIn(jar.el, hr, 8)]
     });
 
     var or = outro.getBoundingClientRect();
     outroScene.layout(or.height * 0.7, {
       // On a narrow screen the sun goes to the left edge, away from the app name and the badge.
       sunX: or.width < 520 ? 0 : 0.12, skyTop: 130, sunTop: 170,
-      avoid: [boxIn($('.foot'), or, 10), boxIn($('.outro__inner .store'), or, 20)]
+      avoid: [boxIn($('.foot'), or, 10), boxIn($('.outro__inner .store'), or, 20)],
+      clear: or.width > 760 ? [boxIn($('#outro-title'), or, 10), boxIn($('.outro__inner .store'), or, 10)] : []
     });
     if (reduce) jar.draw(0, false);
   }
@@ -800,9 +1027,82 @@
     seen.waves = true;
   }
 
-  // ---------- The row of phone pictures: drag to move it ----------
+  // ---------- The row of phone pictures: arrows, dots, or a drag move it ----------
 
   var strip = $('#strip');
+  var stripWrap = $('#stripWrap');
+  var shots = $$('.shot', strip);
+  var stripPrev = $('#stripPrev'), stripNext = $('#stripNext'), stripDots = $('#stripDots');
+  var dots = shots.map(function (shot, i) {
+    var dot = doc.createElement('button');
+    dot.type = 'button';
+    dot.className = 'strip__dot';
+    dot.setAttribute('aria-label', 'Picture ' + (i + 1) + ' of ' + shots.length);
+    dot.addEventListener('click', function () { showShot(i); });
+    stripDots.appendChild(dot);
+    return dot;
+  });
+  // On a phone one picture is in the middle of the row. On a wider screen the row starts at the
+  // left (the same widths as in the style rules).
+  var phoneRow = window.matchMedia('(max-width: 600px)');
+  var ROW_EDGE = 28;
+  // The left edge of one picture in the row.
+  function shotLeft(shot) {
+    return shot.getBoundingClientRect().left - strip.getBoundingClientRect().left + strip.scrollLeft;
+  }
+  // The picture that the row shows now: on a phone the one nearest to the middle, on a wider
+  // screen the first one at the left edge.
+  function shotInView() {
+    var i;
+    if (!phoneRow.matches) {
+      for (i = 0; i < shots.length; i++) {
+        if (shotLeft(shots[i]) >= strip.scrollLeft + ROW_EDGE - 8) return i;
+      }
+      return shots.length - 1;
+    }
+    var mid = strip.scrollLeft + strip.clientWidth / 2, best = 0, bestD = Infinity;
+    for (i = 0; i < shots.length; i++) {
+      var d = Math.abs(shotLeft(shots[i]) + shots[i].offsetWidth / 2 - mid);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  }
+  function showShot(i) {
+    i = clamp(i, 0, shots.length - 1);
+    var left = phoneRow.matches
+      ? shotLeft(shots[i]) + shots[i].offsetWidth / 2 - strip.clientWidth / 2
+      : shotLeft(shots[i]) - ROW_EDGE;
+    if (strip.scrollTo) strip.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+    else strip.scrollLeft = left;
+  }
+  // The arrows show only if the row is wider than the screen. The dots show on a phone, where
+  // each picture has its own place in the row.
+  function paintStrip() {
+    var max = strip.scrollWidth - strip.clientWidth;
+    var scrolls = max > 4;
+    stripWrap.classList.toggle('is-scroll', scrolls);
+    stripPrev.hidden = !scrolls || strip.scrollLeft <= 4;
+    stripNext.hidden = !scrolls || strip.scrollLeft >= max - 4;
+    stripDots.hidden = !scrolls || !phoneRow.matches;
+    var now = shotInView();
+    for (var i = 0; i < dots.length; i++) {
+      dots[i].classList.toggle('is-on', i === now);
+      if (i === now) dots[i].setAttribute('aria-current', 'true'); else dots[i].removeAttribute('aria-current');
+    }
+  }
+  var stripFrame = 0;
+  strip.addEventListener('scroll', function () {
+    if (stripFrame) return;
+    stripFrame = window.requestAnimationFrame(function () { stripFrame = 0; paintStrip(); });
+  }, { passive: true });
+  stripPrev.addEventListener('click', function () { showShot(shotInView() - 1); });
+  stripNext.addEventListener('click', function () { showShot(shotInView() + 1); });
+  strip.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { showShot(shotInView() + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { showShot(shotInView() - 1); e.preventDefault(); }
+  });
+  paintStrip();
+
   var drag = null;
   strip.addEventListener('pointerdown', function (e) {
     if (e.pointerType !== 'mouse' || e.button !== 0) return;
@@ -827,6 +1127,7 @@
     mini.measure();
     sizeWaves();
     if (reduce) drawWaves(0);
+    paintStrip();
   }
   window.addEventListener('resize', function () {
     window.clearTimeout(resizeTimer);

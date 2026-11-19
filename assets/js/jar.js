@@ -78,7 +78,8 @@
   /**
    * Makes one jar.
    * opts.goal: how many marks the glass has. opts.bee: a bee from BeeKind.createBee (ring mode), or nothing.
-   * opts.shadow: false leaves out the shadow on the grass.
+   * opts.shadow: false leaves out the shadow on the grass. opts.shade: the color of that shadow
+   * (with no value it is the green of a summer day).
    */
   function createJar(opts) {
     opts = opts || {};
@@ -100,7 +101,7 @@
     var clipB = node('clipPath', { id: id + 'clipB' }, defsB);
     node('path', { d: SHAPES.body }, clipB);
     if (opts.shadow !== false) {
-      node('ellipse', { cx: W / 2, cy: 1.085 * W, rx: 0.56 * W, ry: 0.065 * W, fill: '#5CB24B', 'fill-opacity': 0.85 }, back);
+      node('ellipse', { cx: W / 2, cy: 1.085 * W, rx: 0.56 * W, ry: 0.065 * W, fill: opts.shade || '#5CB24B', 'fill-opacity': 0.85 }, back);
     }
     node('path', { d: SHAPES.sides + 'Z', fill: 'url(#' + id + 'glass)' }, back);
     var bandWrap = node('g', { 'clip-path': 'url(#' + id + 'clipB)' }, back);

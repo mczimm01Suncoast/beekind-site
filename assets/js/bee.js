@@ -487,8 +487,14 @@
         node('ellipse', { cx: bx + 62, cy: by, rx: 26, ry: 20, fill: C.redDark, 'fill-opacity': 0.55 }, g);
         node('rect', { x: bx - 24, y: by - 28, width: 48, height: 56, rx: 18, fill: C.redDark }, g);
       } else if (name === 'partyHat') {
+        // The base of the hat is round, as in the app: its front edge hangs down in the middle,
+        // and the white band goes along that edge. A flat white oval looked like the open bottom
+        // of a hat that is not on the head (Matt, 2026-11-19).
         g = node('g', { transform: 'rotate(-9 ' + tx + ' ' + (ty + 26) + ')' }, itemLayer);
-        var cone = pts([P(-98, 26), P(98, 26), P(8, -236)]);
+        var hatL = P(-96, 18), hatR = P(96, 18), hatLow = P(0, 70), hatTip = P(8, -236);
+        var hatEdge = 'M' + hatL[0] + ' ' + hatL[1] + 'Q' + hatLow[0] + ' ' + hatLow[1] + ' ' + hatR[0] + ' ' + hatR[1];
+        var cone = 'M' + hatTip[0] + ' ' + hatTip[1] + 'L' + hatL[0] + ' ' + hatL[1] +
+          'Q' + hatLow[0] + ' ' + hatLow[1] + ' ' + hatR[0] + ' ' + hatR[1] + 'Z';
         var coneClip = node('clipPath', { id: id + 'cone' }, g);
         node('path', { d: cone }, coneClip);
         node('path', { d: cone, fill: C.blue }, g);
@@ -497,7 +503,7 @@
           var y = i * 78 - 250;
           node('path', { d: pts([P(-140, y + 110), P(140, y + 30), P(140, y + 68), P(-140, y + 148)]) }, stripes);
         }
-        node('ellipse', { cx: tx, cy: ty + 26, rx: 104, ry: 24, fill: '#fff' }, g);
+        node('path', { d: hatEdge, fill: 'none', stroke: '#fff', 'stroke-width': 36, 'stroke-linecap': 'round' }, g);
         node('circle', { cx: tx + 8, cy: ty - 242, r: 34, fill: '#fff' }, g);
       } else if (name === 'topHat') {
         g = node('g', { transform: 'rotate(8 ' + tx + ' ' + (ty + 20) + ')' }, itemLayer);

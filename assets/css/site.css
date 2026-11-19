@@ -154,6 +154,40 @@ button { font: inherit; color: inherit; }
 }
 .plant svg { display: block; overflow: visible; }
 @keyframes plant-sway { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+.plant--still { animation: none; }
+
+/* The look by season and by time of day (assets/js/look.js sets the colors). */
+.scene__stars { position: absolute; inset: 0; }
+.star {
+  position: absolute; border-radius: 50%; background: #fff; translate: -50% -50%; opacity: .9;
+  animation: star-twinkle var(--tw, 5s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s);
+}
+.star--still { animation: none; }
+@keyframes star-twinkle { from { opacity: .5; } to { opacity: .95; } }
+
+.scene__fall { position: absolute; inset: 0; overflow: hidden; }
+.fall {
+  position: absolute; top: 0; translate: -50% 0;
+  animation: fall-down var(--dur, 80s) linear infinite; animation-delay: var(--delay, 0s);
+}
+.fall--still { animation: none; }
+.fall__sway { animation: fall-sway 12.6s ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
+.fall__bit { display: block; border-radius: 50%; }
+.fall__bit--leaf { rotate: var(--turn, 0deg); animation: leaf-turn 18s linear infinite; }
+.fall--still .fall__bit--leaf { animation: none; }
+@keyframes fall-down {
+  0% { transform: translateY(var(--y0, 0px)); opacity: 0; }
+  4% { opacity: 1; }
+  96% { opacity: 1; }
+  100% { transform: translateY(var(--y1, 100vh)); opacity: 0; }
+}
+@keyframes fall-sway { from { transform: translateX(calc(-1 * var(--sway, 7px))); } to { transform: translateX(var(--sway, 7px)); } }
+@keyframes leaf-turn { to { transform: rotate(360deg); } }
+
+.fill-hill-1 { fill: var(--hill-1, #86D466); }
+.fill-hill-2 { fill: var(--hill-2, #7ACB5C); }
+.fill-ground { fill: var(--ground, #7DCC5B); }
+.fill-cloud { fill: var(--cloud, #fff); }
 
 /* ---------- Hero ---------- */
 
@@ -163,7 +197,7 @@ button { font: inherit; color: inherit; }
   background: linear-gradient(var(--sky-1), var(--sky-2) 60%, var(--grass) 60%);
   display: flex;
 }
-.js .hero { background: linear-gradient(var(--sky-1), var(--sky-2) 62%); }
+.js .hero { background: linear-gradient(var(--sky-1), var(--sky-mid, var(--sky-2)) 31%, var(--sky-2) 62%); }
 
 .hero__inner {
   position: relative; z-index: 2;
@@ -427,16 +461,54 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 /* The screens */
 
 .screens { padding-top: 0; text-align: center; overflow: hidden; }
+/* The row of phone pictures (Matt, 2026-11-19: nothing showed that the row scrolls).
+   Wide screen: all six pictures are in view, and the row does not scroll.
+   Mid-size screen: the row starts at the left, the last picture in view is cut at the edge, and
+   two arrows move the row by one picture.
+   Phone: one picture is in the middle, the next one shows at the side, and two arrows and a row
+   of dots move the row. */
+.strip-wrap { position: relative; }
 .strip {
   display: flex; gap: clamp(16px, 2.6vw, 34px);
-  overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  padding: 34px max(20px, calc((100vw - 1120px) / 2)) 46px;
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 28px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding: 34px 28px 30px;
   cursor: grab;
+}
+.strip-wrap:not(.is-scroll) .strip { cursor: default; }
+.strip__arrow {
+  position: absolute; top: 42%; z-index: 3; width: 52px; height: 52px; translate: 0 -50%;
+  box-shadow: 0 5px 0 rgba(21, 27, 84, .14), 0 10px 24px rgba(21, 27, 84, .18);
+}
+.strip__arrow .icon { width: 26px; height: 26px; }
+.strip__arrow--prev { left: max(10px, calc((100vw - 1180px) / 2)); }
+.strip__arrow--next { right: max(10px, calc((100vw - 1180px) / 2)); }
+.strip__arrow[hidden], .strip__dots[hidden] { display: none; }
+.strip__dots { display: flex; justify-content: center; gap: 4px; padding-bottom: 16px; }
+.strip__dot {
+  width: 28px; height: 28px; border: 0; padding: 0; background: none; cursor: pointer;
+  display: grid; place-items: center;
+}
+.strip__dot::before {
+  content: ""; width: 10px; height: 10px; border-radius: 999px; background: rgba(21, 27, 84, .22);
+  transition: width .3s var(--spring), background-color .2s;
+}
+.strip__dot.is-on::before { width: 24px; background: var(--navy); }
+@media (min-width: 1100px) {
+  .strip {
+    justify-content: center; gap: clamp(16px, 1.8vw, 28px);
+    padding-inline: max(28px, calc((100vw - 1240px) / 2));
+  }
+  .strip .shot { flex: 1 1 0; min-width: 0; max-width: 210px; }
 }
 .strip::-webkit-scrollbar { display: none; }
 .strip.is-drag { cursor: grabbing; scroll-snap-type: none; }
 .strip.is-drag img { pointer-events: none; }
-.shot { flex: 0 0 clamp(190px, 21vw, 248px); margin: 0; scroll-snap-align: center; }
+.shot { flex: 0 0 clamp(190px, 21vw, 248px); margin: 0; scroll-snap-align: start; }
+@media (max-width: 600px) {
+  .strip { padding-inline: max(20px, calc(50% - clamp(95px, 28vw, 120px))); scroll-padding-inline: 0; }
+  .shot { scroll-snap-align: center; }
+}
 .shot figcaption { font-family: var(--font-head); font-weight: 800; font-size: 1.05rem; line-height: 1.25; margin-top: 18px; padding: 0 4px; text-wrap: balance; }
 
 .phone {
@@ -584,7 +656,7 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
   background: linear-gradient(var(--sky-1), var(--sky-2) 68%, var(--grass) 68%);
   display: flex; flex-direction: column;
 }
-.js .outro { background: linear-gradient(var(--sky-1), var(--sky-2) 70%); }
+.js .outro { background: linear-gradient(var(--sky-1), var(--sky-mid, var(--sky-2)) 35%, var(--sky-2) 70%); }
 .outro__inner { position: relative; z-index: 2; text-align: center; padding-top: clamp(150px, 15vw, 180px); flex: 1; }
 .outro h2 { margin-bottom: 26px; }
 .perch { position: absolute; left: 50%; top: 62%; width: 1px; height: 1px; }
