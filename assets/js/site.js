@@ -248,8 +248,9 @@
 
     var or = outro.getBoundingClientRect();
     outroScene.layout(or.height * 0.7, {
-      sunX: 0.12, skyTop: 130, sunTop: 170,
-      avoid: [boxIn($('.foot'), or, 10), boxIn($('.outro__inner .soon'), or, 20)]
+      // On a narrow screen the sun goes to the left edge, away from the app name and the badge.
+      sunX: or.width < 520 ? 0 : 0.12, skyTop: 130, sunTop: 170,
+      avoid: [boxIn($('.foot'), or, 10), boxIn($('.outro__inner .store'), or, 20)]
     });
     if (reduce) jar.draw(0, false);
   }
