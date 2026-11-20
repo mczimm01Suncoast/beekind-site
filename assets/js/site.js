@@ -487,7 +487,8 @@
   var GOAL = 5;
   var counts = { others: 1, me: 1 };
   var countBig = $('#countBig'), countSmall = $('#countSmall');
-  var tagOthers = $('#tagOthers'), tagMe = $('#tagMe');
+  // As in the app, one tag shows only while the jar waits for one act for someone else.
+  var tagWait = $('#tagWait');
   var addButton = $('#addAct'), againButton = $('#startAgain');
   var sheet = $('#actSheet');
 
@@ -503,8 +504,7 @@
     var full = isFull();
     countBig.textContent = full ? 'Jar full!' : total() + ' of ' + GOAL;
     countSmall.textContent = full ? total() + ' kind acts today' : 'kind acts today';
-    tagOthers.textContent = waits() ? '1 more for others' : counts.others + ' for others';
-    tagMe.textContent = counts.me + ' for me';
+    tagWait.hidden = !waits();
     againButton.hidden = !full;
     if (pop && !reduce) {
       countBig.classList.remove('is-pop');

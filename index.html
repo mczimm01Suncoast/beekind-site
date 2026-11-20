@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Bee Kind: Spread Kindness - Kindness Tracker App for iPhone</title>
-  <meta name="description" content="Bee Kind turns kindness into a small daily habit. Each kind act adds honey to your jar. Fill the jar, and your bee throws a party. For iPhone and Apple Watch.">
+  <meta name="description" content="Bee Kind turns kindness into a small daily habit. Each kind act adds honey to your jar. Fill the jar, and your bee throws a party. For iPhone, iPad and Apple Watch.">
   <link rel="canonical" href="https://beekind.io/">
   <meta name="theme-color" content="#7ACBFA">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Bee Kind">
   <meta property="og:title" content="Bee Kind: Spread Kindness">
-  <meta property="og:description" content="Fill a honey jar with kind acts. A small daily habit for iPhone and Apple Watch.">
+  <meta property="og:description" content="Fill a honey jar with kind acts. A small daily habit for iPhone, iPad and Apple Watch.">
   <meta property="og:url" content="https://beekind.io/">
   <meta property="og:image" content="https://beekind.io/assets/img/share.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -50,6 +50,7 @@
   <symbol id="i-widget" viewBox="0 0 24 24"><rect x="3.500" y="3.500" width="7.500" height="7.500" rx="2.200"/><rect x="13" y="3.500" width="7.500" height="7.500" rx="2.200"/><rect x="3.500" y="13" width="17" height="7.500" rx="2.200"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><path d="M7.500 10V7.800a4.500 4.500 0 0 1 9 0V10h.700A1.800 1.800 0 0 1 19 11.800v6.900a1.800 1.800 0 0 1-1.800 1.800H6.800A1.800 1.800 0 0 1 5 18.700v-6.900A1.800 1.800 0 0 1 6.800 10Zm2.200 0h4.600V7.800a2.300 2.300 0 0 0-4.600 0Z"/></symbol>
   <symbol id="i-watch" viewBox="0 0 24 24"><path d="M8.600 2.500h6.800l.700 3.300A3.500 3.500 0 0 1 18.500 9v6a3.500 3.500 0 0 1-2.400 3.200l-.700 3.300H8.600l-.700-3.300A3.500 3.500 0 0 1 5.500 15V9a3.500 3.500 0 0 1 2.400-3.200Zm.400 5.300A1.300 1.300 0 0 0 7.700 9.100v5.800A1.300 1.300 0 0 0 9 16.200h6a1.300 1.300 0 0 0 1.300-1.300V9.100A1.300 1.300 0 0 0 15 7.800Z"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.2 19.2a4.7 4.7 0 0 1-.9-9.3 6 6 0 0 1 11.500-1.300 5.300 5.300 0 0 1-.600 10.600Z"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 2.800a6.200 6.200 0 0 1 6.200 6.200v3.300l1.600 2.900a1.200 1.200 0 0 1-1 1.800H5.200a1.200 1.200 0 0 1-1-1.800l1.600-2.900V9A6.200 6.200 0 0 1 12 2.800ZM9.600 18.800h4.800a2.400 2.400 0 0 1-4.800 0Z"/></symbol>
 </svg>
 
@@ -80,7 +81,7 @@
 
     <div class="hero__inner wrap">
       <div class="hero__copy">
-        <p class="pill rise" style="--i:0">For iPhone and Apple Watch</p>
+        <p class="pill rise" style="--i:0">For iPhone, iPad and Apple Watch</p>
         <h1 id="hero-title" class="rise" style="--i:1">Fill a honey jar with <span class="hl">kind&nbsp;acts</span></h1>
         <p class="lede rise" style="--i:2">Bee Kind turns kindness into a small daily habit. Each kind act adds honey to your jar. Fill the jar, and your bee throws a party.</p>
         <div class="store rise" style="--i:3">
@@ -97,8 +98,7 @@
           <p class="count__small" id="countSmall">kind acts today</p>
         </div>
         <div class="tags">
-          <span class="tag"><svg class="icon tag__icon tag__icon--others" aria-hidden="true"><use href="#i-heart"/></svg><span id="tagOthers">1 for others</span></span>
-          <span class="tag"><svg class="icon tag__icon tag__icon--me" aria-hidden="true"><use href="#i-sun"/></svg><span id="tagMe">1 for me</span></span>
+          <span class="tag tag--wait" id="tagWait" hidden><svg class="icon tag__icon tag__icon--others" aria-hidden="true"><use href="#i-heart"/></svg><span>1 more for others</span></span>
         </div>
         <div class="jar-stage" id="jarStage">
           <noscript><img class="jar-stage__still" src="assets/img/phone-1.webp" width="600" height="1297" alt="The Bee Kind home screen: a bee in a honey jar, 3 of 5 kind acts today"></noscript>
@@ -120,7 +120,7 @@
     <svg class="edge edge--grass" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0h1440v38c-180 46-420 52-720 22S180 30 0 62Z"/></svg>
     <div class="wrap">
       <p class="eyebrow reveal">How it works</p>
-      <h2 id="how-title" class="reveal"><span class="nb">One kind act.</span> <span class="nb">One tap.</span><br>A little more honey.</h2>
+      <h2 id="how-title" class="reveal"><span class="nb">One kind act.</span> <span class="nb">Two taps.</span><br>A little more honey.</h2>
 
       <ol class="steps">
         <li class="step reveal" style="--i:0">
@@ -143,7 +143,7 @@
           </div>
           <p class="step__num" aria-hidden="true">2</p>
           <h3>Tap Kind act</h3>
-          <p>Pick what you did. One tap, and it is in your jar.</p>
+          <p>Pick what you did. Two taps, and it is in your jar. You can add your own kind acts to the list.</p>
         </li>
         <li class="step reveal" style="--i:2">
           <div class="step__art step__art--jar" id="miniJar" aria-hidden="true"></div>
@@ -159,6 +159,7 @@
   <section class="band band--cream screens" aria-labelledby="screens-title">
     <div class="wrap">
       <h2 id="screens-title" class="reveal">A small habit that feels good</h2>
+      <p class="screens__lede reveal">The meadow follows your day: flowers in spring, leaves in autumn, snow in winter, and stars at night.</p>
     </div>
     <div class="strip-wrap" id="stripWrap">
     <button class="round-btn round-btn--white strip__arrow strip__arrow--prev" id="stripPrev" type="button" aria-label="The picture before" hidden><svg class="icon" aria-hidden="true"><use href="#i-left"/></svg></button>
@@ -166,9 +167,9 @@
     <div class="strip" id="strip" tabindex="0" role="group" aria-label="Pictures of the app">
       <figure class="shot reveal" style="--i:0"><div class="phone"><img src="assets/img/phone-1.webp" width="600" height="1297" loading="lazy" alt="Home screen: a bee floats in a honey jar. 3 of 5 kind acts today."></div><figcaption>Fill a honey jar with kind acts</figcaption></figure>
       <figure class="shot reveal" style="--i:1"><div class="phone"><img src="assets/img/phone-2.webp" width="600" height="1297" loading="lazy" alt="The jar is full. Confetti falls and the bee is happy."></div><figcaption>A full jar makes your bee happy</figcaption></figure>
-      <figure class="shot reveal" style="--i:2"><div class="phone"><img src="assets/img/phone-3.webp" width="600" height="1297" loading="lazy" alt="The list of kind acts: said a kind word, helped someone, gave something, said thank you, took care of me, something else."></div><figcaption>Log a kind act with one tap</figcaption></figure>
-      <figure class="shot reveal" style="--i:3"><div class="phone"><img src="assets/img/phone-4.webp" width="600" height="1297" loading="lazy" alt="Your bee, named Bea, with a crown. Other things to wear show below."></div><figcaption>Name your bee. Earn things to wear.</figcaption></figure>
-      <figure class="shot reveal" style="--i:4"><div class="phone"><img src="assets/img/phone-5.webp" width="600" height="1297" loading="lazy" alt="A month of jars: 10 full jars, 74 kind acts, 4 days in a row."></div><figcaption>See your kindest days</figcaption></figure>
+      <figure class="shot reveal" style="--i:2"><div class="phone"><img src="assets/img/phone-3.webp" width="600" height="1297" loading="lazy" alt="The list of kind acts: said a kind word, helped someone, gave something, said thank you, took care of me, something else."></div><figcaption>Log a kind act in two taps</figcaption></figure>
+      <figure class="shot reveal" style="--i:3"><div class="phone"><img src="assets/img/phone-4.webp" width="600" height="1297" loading="lazy" alt="Your bee, named Bea, with a crown. Other things to wear, a bear and four backgrounds show below."></div><figcaption>Name your bee. Earn things to wear.</figcaption></figure>
+      <figure class="shot reveal" style="--i:4"><div class="phone"><img src="assets/img/phone-5.webp" width="600" height="1297" loading="lazy" alt="A month of jars: 10 full jars, 81 kind acts, 4 days in a row."></div><figcaption>See your kindest days</figcaption></figure>
       <figure class="shot reveal" style="--i:5"><div class="phone"><img src="assets/img/phone-6.webp" width="600" height="1297" loading="lazy" alt="The jar on the Lock Screen, in the Dynamic Island and in widgets."></div><figcaption>On your Lock Screen, widgets and Watch</figcaption></figure>
     </div>
     <div class="strip__dots" id="stripDots" hidden></div>
@@ -182,6 +183,8 @@
         <p class="eyebrow reveal">Your bee</p>
         <h2 id="bee-title" class="reveal">Name your bee.<br>Earn things to wear.</h2>
         <p class="reveal">Give your bee a name and pick its look. As your full jars add up, your bee earns a daisy, a bow, a party hat, a top hat and a crown.</p>
+        <p class="reveal">Full jars also open new backgrounds and a new friend: a bear.</p>
+        <p class="reveal">We add new things to earn over time.</p>
         <p class="reveal">Touch your bee and it giggles.</p>
       </div>
       <div class="looks reveal" id="looks" role="group" aria-label="Things for the bee to wear">
@@ -200,12 +203,13 @@
     <div class="wrap">
       <div class="duo">
         <div class="duo__art reveal">
-          <div class="phone phone--tilt-l"><img src="assets/img/phone-5.webp" width="600" height="1297" loading="lazy" alt="A month of jars: 10 full jars, 74 kind acts, 4 days in a row. Sunday is the kindest day."></div>
+          <div class="phone phone--tilt-l"><img src="assets/img/phone-5.webp" width="600" height="1297" loading="lazy" alt="A month of jars: 10 full jars, 81 kind acts, 4 days in a row. Tuesday is the kindest day."></div>
         </div>
         <div class="duo__copy">
           <p class="eyebrow reveal">Look back</p>
           <h2 id="back-title" class="reveal">See your kindest days</h2>
           <p class="reveal">See your month at a glance: full jars, kind acts and days in a row. Find your kindest day of the week and the acts you do most.</p>
+          <p class="reveal">Tap a day to see its kind acts. You can add one that you missed.</p>
           <p class="reveal">Share a picture of your jar and invite a friend to spread kindness with you.</p>
         </div>
       </div>
@@ -222,7 +226,8 @@
             <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-widget"/></svg></span><div><h3>Home Screen widgets</h3><p>A jar that fills, on your Home Screen.</p></div></li>
             <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></span><div><h3>Lock Screen and Dynamic Island</h3><p>Your jar shows after your first kind act of the day.</p></div></li>
             <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></span><div><h3>Apple Watch</h3><p>Log a kind act from your wrist.</p></div></li>
-            <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></span><div><h3>A gentle daily reminder</h3><p>Only if you turn it on.</p></div></li>
+            <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-cloud"/></svg></span><div><h3>iPhone and iPad</h3><p>Both show the same jar, with iCloud.</p></div></li>
+            <li class="reveal"><span class="facts__icon"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></span><div><h3>Gentle reminders</h3><p>A kind idea each day, and a nudge in the evening if your jar is not full. Only if you turn them on.</p></div></li>
           </ul>
         </div>
       </div>

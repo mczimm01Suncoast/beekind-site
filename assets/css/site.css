@@ -265,7 +265,8 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.14); } 100% { transform: scale(1); } }
 .count__small { font-weight: 800; font-size: clamp(1.15rem, 1.9vw, 1.4rem); margin-top: 2px; }
 
-.tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+/* The room of the tag is always there, so the jar does not move when the tag comes or goes. */
+.tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; min-height: 37px; }
 .tag {
   display: inline-flex; align-items: center; gap: 7px;
   background: #fff; border-radius: 999px; padding: 7px 15px 7px 11px;
@@ -274,7 +275,9 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 }
 .tag__icon { width: 20px; height: 20px; }
 .tag__icon--others { color: var(--rose); }
-.tag__icon--me { color: #FFC21F; }
+.tag[hidden] { display: none; }
+/* The jar waits for one act for someone else: the tag has a rose edge, as in the app. */
+.tag--wait { box-shadow: 0 0 0 2.5px var(--rose), 0 3px 10px rgba(21, 27, 84, .08); }
 
 .jar-stage { position: relative; width: clamp(240px, 27vw, 350px); margin-top: 8px; }
 .jar-stage__still { display: block; width: 78%; margin: 0 auto; border-radius: 40px; }
@@ -461,6 +464,8 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 /* The screens */
 
 .screens { padding-top: 0; text-align: center; overflow: hidden; }
+/* One line under the title: the looks of the meadow. */
+.screens__lede { font-weight: 700; font-size: 1.2rem; max-width: 30em; margin: 14px auto 0; text-wrap: balance; }
 /* The row of phone pictures (Matt, 2026-11-19: nothing showed that the row scrolls).
    Wide screen: all six pictures are in view, and the row does not scroll.
    Mid-size screen: the row starts at the left, the last picture in view is cut at the edge, and

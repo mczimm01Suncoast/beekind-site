@@ -322,6 +322,10 @@
 
     if (mode === 'ring') {
       ringFront = node('g', { fill: 'none' }, svg);
+      // The left end of the near half is round, as in the app (RingView.swift): the rear of the
+      // bee is behind it. With a flat end, the rear of the bee had a hard straight edge.
+      node('circle', { cx: r1(670 + Math.cos(183 * Math.PI / 180) * 420), cy: r1(1095 + Math.sin(183 * Math.PI / 180) * 135),
+        r: 95, fill: C.ring, stroke: 'none' }, ringFront);
       node('path', { d: ringArc(-3, 183), stroke: C.ring, 'stroke-width': 190 }, ringFront);
       node('path', { d: ringArc(14, 166, -56), stroke: C.ringShade, 'stroke-width': 62, 'stroke-linecap': 'round' }, ringFront);
       node('path', { d: ringArc(10, 170, 44), stroke: C.ringLight, 'stroke-width': 60, 'stroke-linecap': 'round' }, ringFront);
