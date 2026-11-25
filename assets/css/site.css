@@ -208,6 +208,7 @@ button { font: inherit; color: inherit; }
   padding-top: 104px; padding-bottom: 64px;
 }
 
+.pills { display: flex; flex-wrap: wrap; gap: 8px 10px; }
 .pill {
   display: inline-flex; align-items: center;
   background: rgba(255, 255, 255, .8); color: var(--navy);
@@ -665,6 +666,22 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 .plan__price { font-family: var(--font-head); font-weight: 900; font-size: clamp(2rem, 3.6vw, 2.7rem); line-height: 1.1; letter-spacing: -.02em; margin: 8px 0 6px; }
 .plan__price span { display: block; font-size: 1rem; font-weight: 800; letter-spacing: 0; }
 .plan__note { display: inline-block; margin: 6px 0 0; background: var(--cream); border-radius: 999px; padding: 5px 14px; font-weight: 800; font-size: .95rem; }
+.pledge {
+  display: flex; align-items: center; gap: 18px; text-align: left;
+  max-width: 620px; margin: clamp(26px, 3.5vw, 40px) auto 0; padding: 18px 26px 18px 20px;
+  background: #FFE4EA; border: 3px solid #F45D6E; border-radius: 30px;
+  box-shadow: 0 7px 0 rgba(150, 80, 0, .16), 0 18px 34px rgba(120, 60, 0, .12);
+}
+.pledge__heart { position: relative; flex: none; width: 100px; height: 100px; display: grid; place-items: center; }
+.pledge__heart .icon { position: absolute; inset: 0; width: 100%; height: 100%; fill: #F45D6E; }
+.pledge__heart b { position: relative; top: -3px; color: #fff; font-family: var(--font-head); font-weight: 900; font-size: 1.3rem; }
+.pledge__soon { display: inline-block; margin: 0 0 4px; background: #F45D6E; color: #fff; border-radius: 999px; padding: 3px 12px; font-weight: 800; font-size: .85rem; }
+.pledge h3 { font-size: 1.5rem; font-weight: 900; margin: 0 0 4px; }
+.pledge p:not(.pledge__soon) { margin: 0; font-weight: 700; color: rgba(21, 27, 84, .82); }
+.pill--give { gap: 8px; background: #FFE4EA; color: #B0213C; text-decoration: none; box-shadow: inset 0 0 0 2px #F45D6E; transition: transform .3s var(--spring), background-color .2s; }
+.pill--give .icon { width: 18px; height: 18px; fill: #F45D6E; }
+.pill--give:hover { background: #fff; transform: translateY(-2px); }
+#giving { scroll-margin-top: 90px; }
 .fine { font-size: .93rem; font-weight: 600; color: #4E2B00; max-width: 47em; margin: clamp(28px, 4vw, 44px) auto 0; }
 
 .edge--drip { bottom: -119px; height: 120px; fill: var(--honey-2); z-index: 3; }
@@ -785,6 +802,7 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
   .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-top: 96px; padding-bottom: 46px; text-align: center; }
   .hero__copy { display: flex; flex-direction: column; align-items: center; }
   .store { align-items: center; }
+  .pills { justify-content: center; }
   .store__row { justify-content: center; }
   .lede { margin-inline: auto; }
   .jar-stage { width: clamp(240px, 62vw, 330px); }
@@ -817,6 +835,11 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 @media (max-width: 480px) {
   .appname, .doc .appname { font-size: 1.08rem; gap: 10px; }
   .appname img { width: 46px; height: 46px; }
+  .pledge { gap: 12px; padding: 14px 16px 14px 12px; border-radius: 24px; }
+  .pledge__heart { width: 76px; height: 76px; }
+  .pledge__heart b { font-size: 1.02rem; }
+  .pledge h3 { font-size: 1.2rem; }
+  .pledge p:not(.pledge__soon) { font-size: .98rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
