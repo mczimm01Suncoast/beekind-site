@@ -121,7 +121,9 @@ button { font: inherit; color: inherit; }
 .round-btn--soft:hover { background: #E2E5EF; }
 #soundToggle .icon--off, #soundToggle[aria-pressed="false"] .icon--on { display: none; }
 #soundToggle[aria-pressed="false"] .icon--off { display: block; }
-.top__nav + .round-btn { margin-left: 6px; }
+.top__tools { display: flex; align-items: center; gap: 8px; }
+.top__nav + .top__tools { margin-left: 6px; }
+.social-btn .icon { width: 20px; height: 20px; }
 
 /* ---------- Scene: sky, sun, clouds, hills, flowers ---------- */
 
@@ -249,14 +251,17 @@ button { font: inherit; color: inherit; }
 .badge img { display: block; height: 60px; width: auto; }
 .store__row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .store--center .store__row { justify-content: center; }
-.android-soon {
-  display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
-  background: rgba(255, 255, 255, .86); color: var(--navy);
-  font-family: var(--font-head); font-weight: 800; font-size: 1.02rem; line-height: 1.2;
-  padding: 10px 20px 10px 16px; border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(21, 27, 84, .12);
+.store__row .badge { display: block; }
+.soon-badge {
+  display: inline-flex; align-items: center; gap: 11px; box-sizing: border-box; height: 60px; margin: 0; padding: 0 20px 0 17px;
+  background: #000; color: #fff; border: 1.5px solid #A6A6A6; border-radius: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
-.android-soon .soon__dot { background: var(--gold-deep); }
+.soon-badge .soon__dot { width: 11px; height: 11px; }
+.soon-badge__words { display: flex; flex-direction: column; text-align: left; line-height: 1.05; }
+.soon-badge__small { font-size: 12.5px; font-weight: 500; letter-spacing: .01em; }
+.soon-badge__big { font-size: 25px; font-weight: 600; letter-spacing: -.015em; }
+.soon-badge__big sup { font-size: 10px; font-weight: 500; vertical-align: 12px; margin-left: 1px; }
 .soon__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 0 rgba(255, 213, 61, .7); animation: dot 2.2s ease-out infinite; }
 @keyframes dot { to { box-shadow: 0 0 0 12px rgba(255, 213, 61, 0); } }
 
@@ -685,6 +690,18 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
 }
 .foot__nav a:hover { background: #fff; transform: translateY(-3px); }
 .foot__copy { margin: 16px 0 0; font-size: .95rem; font-weight: 700; color: #123A12; }
+.foot__legal { margin: 8px auto 0; max-width: 46em; font-size: .78rem; font-weight: 600; line-height: 1.45; color: rgba(18, 58, 18, .78); }
+.follow { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 26px 0 0; }
+.follow__link {
+  display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 22px 0 18px;
+  background: var(--navy); color: #fff; border-radius: 999px; text-decoration: none;
+  font-family: var(--font-head); font-weight: 800; font-size: 1.05rem;
+  box-shadow: 0 5px 0 rgba(21, 27, 84, .25);
+  transition: transform .3s var(--spring), background-color .2s;
+}
+.follow__link .icon { width: 22px; height: 22px; }
+.follow__link:hover { background: var(--navy-2); transform: translateY(-3px); }
+.follow__link:active { transform: translateY(1px); }
 
 /* ---------- Text pages: privacy, support, terms ---------- */
 
@@ -763,7 +780,8 @@ html.settled .rise, html.settled .hero__demo, html.settled .hl { animation: none
   .text-page .brand span { display: none; }
   .doc__bee { width: 96px; height: 96px; top: -70px; }
   .doc h1 { padding-right: 70px; }
-  .top .round-btn { margin-left: auto; }
+  .top .top__tools { margin-left: auto; }
+  .text-page .social-btn { display: none; }
   .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 34px; padding-top: 96px; padding-bottom: 46px; text-align: center; }
   .hero__copy { display: flex; flex-direction: column; align-items: center; }
   .store { align-items: center; }
